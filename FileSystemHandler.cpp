@@ -53,6 +53,12 @@ std::string FileSystemHandler::GetList(std::string receiver)
     std::string path = "Database/" + receiver;
 
     dir = opendir(path.c_str());
+
+    if (dir == NULL)
+    {
+        throw "Directory is empty";
+    }
+
     std::string found;
 
     while ((data = readdir(dir)) != NULL)
@@ -100,6 +106,11 @@ std::string FileSystemHandler::Read(std::string receiver, std::string subject)
     dir = opendir(path.c_str());
     std::string found;
 
+    if (dir == NULL)
+    {
+        throw "Error";
+    }
+
     while ((data = readdir(dir)) != NULL)
     {
         found = data->d_name;
@@ -138,6 +149,11 @@ bool FileSystemHandler::Delete(std::string receiver, std::string subject)
 
     dir = opendir(path.c_str());
     std::string found;
+
+    if (dir == NULL)
+    {
+        throw "Error";
+    }
 
     while ((data = readdir(dir)) != NULL)
     {
