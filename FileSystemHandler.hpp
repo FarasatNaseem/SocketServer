@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 class FileSystemHandler
 {
@@ -14,10 +15,13 @@ private:
     /* data */
     bool CreateFolder(std::string folderName);
     int counter = 0;
+    int GetLastID(std::string receiverName);
+    bool MatchTwoString(std::string One, std::string two);
 
 public:
     bool Save(std::string sender, std::string receiver, std::string subject, std::string message);
-    bool Delete();
+    bool Delete(std::string reveiver, std::string subject);
     std::vector<std::string> FetchAll();
-    std::string Read();
+    std::string Read(std::string reveiver, std::string subject);
+    std::string GetList(std::string receiver);
 };

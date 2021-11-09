@@ -105,30 +105,98 @@ void ServerListener::HandleClient(int clientSocket)
         {
             command = this->parser->ParseDatabaseActionCommand(buffer, receivedBytes);
 
-            if (command == "SEND")
+            if (command == "SEND") // Done.
             {
                 senderName = this->parser->ParseSenderName(buffer, receivedBytes);
                 receiverName = this->parser->ParseReceiverName(buffer, receivedBytes);
+                subject = this->parser->ParseSubject(buffer, receivedBytes);
+                userMessage = this->parser->ParseMessage(buffer, receivedBytes);
 
-                this->fileSystemHandler->Save("Farasat", "Naseem", "Login", "MyLogin");
+                if (this->fileSystemHandler->Save(senderName, receiverName, subject, userMessage))
+                {
+                    if (send(clientSocket, "OK", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
+                else
+                {
+                    if (send(clientSocket, "Err", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
             }
             else if (command == "LIST")
             {
-            }
-            else if (command == "DEL")
-            {
-            }
-            else if (command == "READ")
-            {
-            }
+                receiverName = this->parser->ParseReceiverName(buffer, receivedBytes);
+                std::string data = this->fileSystemHandler->GetList(receiverName);
 
-            // std::cout << "\nReceived message: " << std::string(buffer, 0, receivedBytes);
+                if (data != " ")
+                {
+                    if (send(clientSocket, data.c_str(), data.size() + 1, 0) == -1)
+                    {
+                        throw "Read failed";
+                    }
+                }
+                else
+                {
+
+                    if (send(clientSocket, "Err", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
+            }
+            else if (command == "DEL") // Done
+            {
+                receiverName = this->parser->ParseReceiverName(buffer, receivedBytes);
+                subject = this->parser->ParseSubject(buffer, receivedBytes);
+
+                if (this->fileSystemHandler->Delete(receiverName, subject))
+                {
+                    if (send(clientSocket, "OK", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
+                else
+                {
+                    if (send(clientSocket, "Err", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
+            }
+            else if (command == "READ") // Done
+            {
+                receiverName = this->parser->ParseReceiverName(buffer, receivedBytes);
+                subject = this->parser->ParseSubject(buffer, receivedBytes);
+
+                std::string data = this->fileSystemHandler->Read(receiverName, subject);
+
+                if (data != " ")
+                {
+                    if (send(clientSocket, data.c_str(), data.size() + 1, 0) == -1)
+                    {
+                        throw "Read failed";
+                    }
+                }
+                else
+                {
+
+                    if (send(clientSocket, "Err", 3, 0) == -1)
+                    {
+                        throw "send answer failed";
+                    }
+                }
+            }
         }
 
-        if (send(clientSocket, "OK", 3, 0) == -1)
-        {
-            throw "send answer failed";
-        }
+        // if (send(clientSocket, "OK", 3, 0) == -1)
+        // {
+        //     throw "send answer failed";
+        // }
     }
 
     close(clientSocket);

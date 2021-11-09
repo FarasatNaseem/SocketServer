@@ -58,6 +58,41 @@ std::string CommandParser::ParseReceiverName(char buffer[], int size)
         allCommands = this->ParseAllCommand(buffer, size);
         return allCommands[1];
     }
+
+    return " ";
+}
+
+std::string CommandParser::ParseSubject(char buffer[], int size)
+{
+    std::string actionCommand = this->ParseDatabaseActionCommand(buffer, size);
+
+    std::vector<std::string> allCommands;
+    allCommands = this->ParseAllCommand(buffer, size);
+
+    if (actionCommand == "SEND")
+    {
+        return allCommands[3];
+    }
+    else if (actionCommand == "DEL" || actionCommand == "READ")
+    {
+        return allCommands[2];
+    }
+
+    return " ";
+}
+
+std::string CommandParser::ParseMessage(char buffer[], int size)
+{
+    std::string actionCommand = this->ParseDatabaseActionCommand(buffer, size);
+
+    std::vector<std::string> allCommands;
+
+    if (actionCommand == "SEND")
+    {
+        allCommands = this->ParseAllCommand(buffer, size);
+    }
+
+    return allCommands[4];
 }
 
 std::vector<std::string> CommandParser::ParseAllCommand(char buffer[], int size)
@@ -75,6 +110,11 @@ std::vector<std::string> CommandParser::ParseAllCommand(char buffer[], int size)
         }
 
         command += buffer[i];
+    }
+
+    if (allCommands[allCommands.size() - 1] != command)
+    {
+        allCommands.push_back(command);
     }
 
     return allCommands;

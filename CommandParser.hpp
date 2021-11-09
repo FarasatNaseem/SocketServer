@@ -4,8 +4,6 @@
 
 class CommandParser
 {
-private:
-    /* data */
 public:
     std::string ParseDatabaseActionCommand(char buffer[], int size);
     std::string ParseSenderName(char buffer[], int size);
