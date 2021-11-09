@@ -10,6 +10,7 @@
 #include <cstring>
 #include "ServerListenerListenAddress.cpp"
 #include "CommandParser.cpp"
+#include "FileSystemHandler.cpp"
 
 class ServerListener
 {
@@ -17,6 +18,7 @@ private:
     ServerListenerListenAddress *listenAddress;
     void SetListenAddress(ServerListenerListenAddress *listenAddress);
     CommandParser *parser;
+    FileSystemHandler *fileSystemHandler;
 
     int listeningSocket;
     // int clientSocket;

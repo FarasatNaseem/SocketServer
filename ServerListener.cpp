@@ -4,6 +4,7 @@ ServerListener::ServerListener(ServerListenerListenAddress *listenAddress)
 {
     this->listenAddress = listenAddress;
     this->parser = new CommandParser();
+    this->fileSystemHandler = new FileSystemHandler();
 }
 
 ServerListenerListenAddress *ServerListener::GetListenAddress()
@@ -87,8 +88,13 @@ void ServerListener::Start()
 void ServerListener::HandleClient(int clientSocket)
 {
     char buffer[1024];
-    std::string clientMessage;
+    // std::string clientMessage;
     std::string command;
+
+    std::string senderName;
+    std::string receiverName;
+    std::string subject;
+    std::string userMessage;
 
     while (true)
     {
@@ -101,6 +107,10 @@ void ServerListener::HandleClient(int clientSocket)
 
             if (command == "SEND")
             {
+                senderName = this->parser->ParseSenderName(buffer, receivedBytes);
+                receiverName = this->parser->ParseReceiverName(buffer, receivedBytes);
+
+                this->fileSystemHandler->Save("Farasat", "Naseem", "Login", "MyLogin");
             }
             else if (command == "LIST")
             {
