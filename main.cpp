@@ -49,21 +49,28 @@ void signalHandler(int sig)
 
 int main(int argc, char const *argv[])
 {
-    if (signal(SIGINT, signalHandler) == SIG_ERR)
+    try
     {
-        throw "Signal error";
-    }
+        if (signal(SIGINT, signalHandler) == SIG_ERR)
+        {
+            throw "Signal error";
+        }
 
-    if (argc < 2)
+        if (argc < 2)
+        {
+            std::cout << "Argument out of range exception\n";
+        }
+
+        int port = std::stoi(argv[2]);
+        std::string ipAddress = argv[1];
+
+        Server *server = new Server(ipAddress, port);
+        server->Start();
+    }
+    catch (const std::exception &e)
     {
-        std::cout << "Argument out of range exception\n";
+        std::cerr << e.what() << '\n';
     }
-
-    int port = std::stoi(argv[2]);
-    std::string ipAddress = argv[1];
-
-    Server *server = new Server(ipAddress, port);
-    server->Start();
 
     return 0;
 }
