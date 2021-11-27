@@ -45,7 +45,6 @@ std::string FileSystemHandler::GetList(std::string receiver)
     DIR *dir;
     int status;
     struct dirent *data;
-    std::string p;
 
     std::string userCompleteData;
     int counter = 0;
@@ -56,7 +55,8 @@ std::string FileSystemHandler::GetList(std::string receiver)
 
     if (dir == NULL)
     {
-        throw "Directory is empty";
+        std::cout << "folder doesnt exist";
+        return " ";
     }
 
     std::string found;
@@ -70,24 +70,29 @@ std::string FileSystemHandler::GetList(std::string receiver)
             continue;
         }
 
-        p = "Database/" + receiver + "/" + found;
+        path = "Database/" + receiver + "/" + found;
 
-        std::ifstream messageFile(p);
+        std::ifstream messageFile(path);
 
-        std::string fileData;
-        getline(messageFile, fileData);
+        if (messageFile.is_open())
+        {
+            std::string fileData;
+            getline(messageFile, fileData);
+            std::cout << "\n" << fileData;
+            userCompleteData += "\nMessage: ";
+            userCompleteData += fileData;
+            userCompleteData += " Receiver:";
+            userCompleteData += receiver;
+            userCompleteData += "Subject: ";
+            found = found.substr(0, found.size() - 4);
+            userCompleteData += found;
+            userCompleteData += " \n";
 
-        userCompleteData += "\nMessage: ";
-        userCompleteData += fileData;
-        userCompleteData += " Receiver:";
-        userCompleteData += receiver;
-        userCompleteData += "Subject: ";
-        found = found.substr(0, found.size() - 4);
-        userCompleteData += found;
-        userCompleteData += " \n";
-
-        messageFile.close();
+            messageFile.close();
+        }
     }
+
+    // userCompleteData = (userCompleteData.length() == 0) ? " " : userCompleteData;
 
     closedir(dir);
 
@@ -108,7 +113,7 @@ std::string FileSystemHandler::Read(std::string receiver, std::string subject)
 
     if (dir == NULL)
     {
-        throw "Error";
+        return " ";
     }
 
     while ((data = readdir(dir)) != NULL)
@@ -152,7 +157,7 @@ bool FileSystemHandler::Delete(std::string receiver, std::string subject)
 
     if (dir == NULL)
     {
-        throw "Error";
+        return false;
     }
 
     while ((data = readdir(dir)) != NULL)
@@ -180,8 +185,40 @@ bool FileSystemHandler::Delete(std::string receiver, std::string subject)
     return false;
 }
 
-bool FileSystemHandler::Save(std::string sender, std::string receiver, std::string subject, std::string message)
+// Working.
+bool FileSystemHandler::Save(std::string sender, std::vector<std::string> receivers, std::string subject, std::string message)
 {
+    bool isSaved = false;
+    std::vector<std::future<bool>> worker;
+
+    for (int i = 0; i < receivers.size(); i++)
+    {
+        worker.push_back(std::async(&FileSystemHandler::SaveSingleMessage, this, sender, receivers[i], subject, message));
+    }
+
+    for (int i = 0; i < worker.size(); i++)
+    {
+        isSaved = worker[i].get();
+
+        if (isSaved == false)
+        {
+            break;
+        }
+    }
+
+    if (isSaved)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool FileSystemHandler::SaveSingleMessage(std::string sender, std::string receiver, std::string subject, std::string message)
+{
+    static std::mutex messageStorerLock;
+    std::lock_guard<std::mutex> lockGuard(messageStorerLock);
+
     if (this->CreateFolder(receiver))
     {
         // Create ids file and open a text file

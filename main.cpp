@@ -11,19 +11,19 @@ void signalHandler(int sig)
 {
     if (sig == SIGINT)
     {
-       throw ("abort Requested... "); 
-       
+        throw("abort Requested... ");
+
         abortRequested = 1;
 
         if (new_socket != -1)
         {
             if (shutdown(new_socket, SHUT_RDWR) == -1)
             {
-               throw ("shutdown new_socket");
+                throw("shutdown new_socket");
             }
             if (close(new_socket) == -1)
             {
-               throw ("close new_socket");
+                throw("close new_socket");
             }
             new_socket = -1;
         }
@@ -32,11 +32,11 @@ void signalHandler(int sig)
         {
             if (shutdown(create_socket, SHUT_RDWR) == -1)
             {
-               throw ("shutdown create_socket");
+                throw("shutdown create_socket");
             }
             if (close(create_socket) == -1)
             {
-               throw ("close create_socket");
+                throw("close create_socket");
             }
             create_socket = -1;
         }
@@ -51,7 +51,7 @@ int main(int argc, char const *argv[])
 {
     if (signal(SIGINT, signalHandler) == SIG_ERR)
     {
-       throw "Signal error";
+        throw "Signal error";
     }
 
     if (argc < 2)

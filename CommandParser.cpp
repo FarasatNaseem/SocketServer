@@ -1,5 +1,6 @@
 #include "CommandParser.hpp"
 
+// DONE.
 std::string CommandParser::ParseDatabaseActionCommand(char buffer[], int size)
 {
     std::string command;
@@ -16,6 +17,7 @@ std::string CommandParser::ParseDatabaseActionCommand(char buffer[], int size)
     return command;
 }
 
+// Dont need it now.
 std::string CommandParser::ParseSenderName(char buffer[], int size)
 {
     std::string actionCommand = this->ParseDatabaseActionCommand(buffer, size);
@@ -30,16 +32,12 @@ std::string CommandParser::ParseSenderName(char buffer[], int size)
     return allCommands[1];
 }
 
+// Done.
 std::string CommandParser::ParseReceiverName(char buffer[], int size)
 {
     std::string actionCommand = this->ParseDatabaseActionCommand(buffer, size);
 
     std::vector<std::string> allCommands;
-    if (actionCommand == "SEND")
-    {
-        allCommands = this->ParseAllCommand(buffer, size);
-        return allCommands[2];
-    }
 
     if (actionCommand == "LIST")
     {
@@ -71,7 +69,7 @@ std::string CommandParser::ParseSubject(char buffer[], int size)
 
     if (actionCommand == "SEND")
     {
-        return allCommands[3];
+        return allCommands[allCommands.size() - 2];
     }
     else if (actionCommand == "DEL" || actionCommand == "READ")
     {
@@ -92,7 +90,28 @@ std::string CommandParser::ParseMessage(char buffer[], int size)
         allCommands = this->ParseAllCommand(buffer, size);
     }
 
-    return allCommands[4];
+    return allCommands[allCommands.size() - 1];
+}
+
+std::vector<std::string> CommandParser::ParseAllReceiverName(char buffer[], int size)
+{
+    std::string actionCommand = this->ParseDatabaseActionCommand(buffer, size);
+
+    std::vector<std::string> allReceiver;
+
+    std::vector<std::string> allCommands;
+
+    if (actionCommand == "SEND")
+    {
+        allCommands = this->ParseAllCommand(buffer, size);
+
+        for (int i = 1; i < (allCommands.size() - 2); i++)
+        {
+            allReceiver.push_back(allCommands[i]);
+        }
+    }
+
+    return allReceiver;
 }
 
 std::vector<std::string> CommandParser::ParseAllCommand(char buffer[], int size)
