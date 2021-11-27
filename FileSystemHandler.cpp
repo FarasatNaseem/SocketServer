@@ -3,7 +3,7 @@
 
 bool FileSystemHandler::CreateFolder(std::string folderName)
 {
-    std::string path = "Database/" + folderName;
+    std::string path = "Database/Message/" + folderName;
 
     bool isCreated = mkdir(path.c_str(), 0777);
 
@@ -17,7 +17,7 @@ bool FileSystemHandler::CreateFolder(std::string folderName)
 
 int FileSystemHandler::GetLastID(std::string receiverName)
 {
-    std::ifstream counterFile("Database/" + receiverName + "/Counter.txt");
+    std::ifstream counterFile("Database/Message/" + receiverName + "/Counter.txt");
 
     std::string id;
     getline(counterFile, id);
@@ -57,6 +57,7 @@ std::string FileSystemHandler::GetFileData(std::string path)
     return fileData;
 }
 
+// TODO:
 std::string FileSystemHandler::GetList(std::string receiver)
 {
     DIR *dir;
@@ -67,7 +68,7 @@ std::string FileSystemHandler::GetList(std::string receiver)
     std::string userCompleteData;
     int counter = 0;
 
-    std::string path = "Database/" + receiver;
+    std::string path = "Database/Message/" + receiver;
 
     dir = opendir(path.c_str());
 
@@ -81,15 +82,24 @@ std::string FileSystemHandler::GetList(std::string receiver)
     while ((data = readdir(dir)) != NULL)
     {
         found = data->d_name;
+        std::cout << found << "FOUND";
 
         if (found == ".." || found == "." || found == "Counter.txt")
         {
             continue;
         }
+        std::string removeString = ".txt";
+        std::string::size_type i = found.find(removeString);
 
-        p = "Database/" + receiver + "/" + found;
+        if (i != std::string::npos)
+            found.erase(i, removeString.length());
 
-        userCompleteData += this->GetFileData(p);
+        std::cout << this->Read(receiver, found);
+
+        p = "Database/Message/" + receiver + "/" + found;
+
+
+        // userCompleteData += this->GetFileData(p);
 
         // // if (messageFile.is_open())
         // {
@@ -124,7 +134,7 @@ std::string FileSystemHandler::Read(std::string receiver, std::string subject)
     struct dirent *data;
     std::string p;
 
-    std::string path = "Database/" + receiver;
+    std::string path = "Database/Message/" + receiver;
 
     dir = opendir(path.c_str());
     std::string found;
@@ -143,7 +153,7 @@ std::string FileSystemHandler::Read(std::string receiver, std::string subject)
 
         if (this->MatchTwoString(found, subject))
         {
-            p = "Database/" + receiver + "/" + found + ".txt";
+            p = "Database/Message/" + receiver + "/" + found + ".txt";
 
             return this->GetFileData(p);
         }
@@ -161,7 +171,7 @@ bool FileSystemHandler::Delete(std::string receiver, std::string subject)
     struct dirent *data;
     std::string p;
 
-    std::string path = "Database/" + receiver;
+    std::string path = "Database/Message/" + receiver;
 
     dir = opendir(path.c_str());
     std::string found;
@@ -180,7 +190,7 @@ bool FileSystemHandler::Delete(std::string receiver, std::string subject)
 
         if (this->MatchTwoString(found, subject))
         {
-            p = "Database/" + receiver + "/" + found + ".txt";
+            p = "Database/Message/" + receiver + "/" + found + ".txt";
 
             status = remove(p.c_str());
 
@@ -233,7 +243,7 @@ bool FileSystemHandler::SaveSingleMessage(std::string sender, std::string receiv
     if (this->CreateFolder(receiver))
     {
         // Create ids file and open a text file
-        std::ofstream counterFile("Database/" + receiver + "/Counter.txt");
+        std::ofstream counterFile("Database/Message/" + receiver + "/Counter.txt");
 
         // Write
         counterFile << "0";
@@ -241,10 +251,9 @@ bool FileSystemHandler::SaveSingleMessage(std::string sender, std::string receiv
         counterFile.close();
 
         // create file to store user data.
-        std::ofstream userDataFile("Database/" + receiver + "/" + subject.c_str() + ".txt");
-
+        std::ofstream userDataFile("Database/Message/" + receiver + "/" + subject.c_str() + ".txt", std::ios_base::app);
         // Write
-        userDataFile << message;
+        userDataFile << message + "\n";
 
         userDataFile.close();
 
@@ -255,7 +264,7 @@ bool FileSystemHandler::SaveSingleMessage(std::string sender, std::string receiv
         int lastId = this->GetLastID(receiver);
 
         // Create ids file and open a text file
-        std::ofstream counterFile("Database/" + receiver + "/Counter.txt");
+        std::ofstream counterFile("Database/Message/" + receiver + "/Counter.txt");
 
         // Write
         counterFile << std::to_string(lastId + 1);
@@ -263,10 +272,10 @@ bool FileSystemHandler::SaveSingleMessage(std::string sender, std::string receiv
         counterFile.close();
 
         // create file to store user data.
-        std::ofstream userDataFile("Database/" + receiver + "/" + subject.c_str() + ".txt");
+        std::ofstream userDataFile("Database/Message/" + receiver + "/" + subject.c_str() + ".txt", std::ios_base::app);
 
         // Write
-        userDataFile << message;
+        userDataFile << message + "\n";
 
         userDataFile.close();
 
