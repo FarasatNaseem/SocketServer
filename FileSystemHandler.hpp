@@ -12,7 +12,6 @@
 #include <thread>
 #include <mutex>
 
-
 class FileSystemHandler
 {
 private:
@@ -29,4 +28,5 @@ public:
     std::vector<std::string> FetchAll();
     std::string Read(std::string reveiver, std::string subject);
     std::string GetList(std::string receiver);
+    std::string GetFileData(std::string path);
 };

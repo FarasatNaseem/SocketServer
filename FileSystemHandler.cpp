@@ -40,11 +40,29 @@ bool FileSystemHandler::MatchTwoString(std::string one, std::string two)
     return true;
 }
 
+std::string FileSystemHandler::GetFileData(std::string path)
+{
+    std::ifstream messageFile(path);
+    std::string fileData;
+
+    if (messageFile.is_open())
+    {
+        getline(messageFile, fileData);
+
+        messageFile.close();
+    }
+
+    std::cout << fileData;
+
+    return fileData;
+}
+
 std::string FileSystemHandler::GetList(std::string receiver)
 {
     DIR *dir;
     int status;
     struct dirent *data;
+    std::string p;
 
     std::string userCompleteData;
     int counter = 0;
@@ -55,7 +73,6 @@ std::string FileSystemHandler::GetList(std::string receiver)
 
     if (dir == NULL)
     {
-        std::cout << "folder doesnt exist";
         return " ";
     }
 
@@ -70,29 +87,30 @@ std::string FileSystemHandler::GetList(std::string receiver)
             continue;
         }
 
-        path = "Database/" + receiver + "/" + found;
+        p = "Database/" + receiver + "/" + found;
 
-        std::ifstream messageFile(path);
+        userCompleteData += this->GetFileData(p);
 
-        if (messageFile.is_open())
-        {
-            std::string fileData;
-            getline(messageFile, fileData);
-            std::cout << "\n" << fileData;
-            userCompleteData += "\nMessage: ";
-            userCompleteData += fileData;
-            userCompleteData += " Receiver:";
-            userCompleteData += receiver;
-            userCompleteData += "Subject: ";
-            found = found.substr(0, found.size() - 4);
-            userCompleteData += found;
-            userCompleteData += " \n";
+        // // if (messageFile.is_open())
+        // {
+        //     // std::string fileData;
+        //     getline(messageFile, fileData);
+        //     std::cout << "\nReading file data start";
+        //     std::cout << "\n"
+        //               << fileData;
+        //     std::cout << "\nReading file data finished.";
+        //     userCompleteData += "\nMessage: ";
+        //     userCompleteData += fileData;
+        //     userCompleteData += " Receiver:";
+        //     userCompleteData += receiver;
+        //     userCompleteData += "Subject: ";
+        //     found = found.substr(0, found.size() - 4);
+        //     userCompleteData += found;
+        //     userCompleteData += " \n";
 
-            messageFile.close();
-        }
+        //     messageFile.close();
+        // }
     }
-
-    // userCompleteData = (userCompleteData.length() == 0) ? " " : userCompleteData;
 
     closedir(dir);
 
@@ -127,14 +145,7 @@ std::string FileSystemHandler::Read(std::string receiver, std::string subject)
         {
             p = "Database/" + receiver + "/" + found + ".txt";
 
-            std::ifstream messageFile(p);
-
-            std::string fileData;
-            getline(messageFile, fileData);
-
-            messageFile.close();
-
-            return fileData;
+            return this->GetFileData(p);
         }
     }
 
