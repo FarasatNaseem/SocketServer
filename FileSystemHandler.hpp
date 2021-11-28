@@ -27,6 +27,7 @@ public:
     bool Delete(std::string reveiver, std::string subject);
     std::vector<std::string> FetchAll();
     std::string Read(std::string reveiver, std::string subject);
+
     std::string GetList(std::string receiver);
     std::string GetFileData(std::string path);
 };

@@ -44,17 +44,22 @@ std::string FileSystemHandler::GetFileData(std::string path)
 {
     std::ifstream messageFile(path);
     std::string fileData;
-
+    std::string allLine;
     if (messageFile.is_open())
     {
-        getline(messageFile, fileData);
+        while (messageFile.good())
+        {
+            getline(messageFile, fileData);
+
+            allLine += (fileData + "\n");
+        }
 
         messageFile.close();
     }
 
     std::cout << fileData;
 
-    return fileData;
+    return allLine;
 }
 
 // TODO:
@@ -98,7 +103,6 @@ std::string FileSystemHandler::GetList(std::string receiver)
 
         p = "Database/Message/" + receiver + "/" + found;
 
-
         // userCompleteData += this->GetFileData(p);
 
         // // if (messageFile.is_open())
@@ -126,6 +130,8 @@ std::string FileSystemHandler::GetList(std::string receiver)
 
     return userCompleteData;
 }
+
+
 
 std::string FileSystemHandler::Read(std::string receiver, std::string subject)
 {

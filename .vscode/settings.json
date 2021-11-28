@@ -58,6 +58,7 @@
         "list": "cpp",
         "map": "cpp",
         "mutex": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "future": "cpp"
     }
 }
